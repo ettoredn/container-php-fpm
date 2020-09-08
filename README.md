@@ -15,3 +15,5 @@
 ## Environment variables
 Should be set via .env for symfony projects. For WP, config is set from the mounted app root.
 
+## Notes
+`docker build -f /path/to/a/Dockerfile .` builds an image from Dockerfile using the context (files) at ". "
