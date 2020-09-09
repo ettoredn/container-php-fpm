@@ -35,9 +35,8 @@ RUN cd /usr/src/xdebug && phpize \
 CMD ["/bin/sh"]
 
 # Create the image
-FROM alpine
+FROM alpine AS production
 ENV PHP_DEPS libxml2 openssl sqlite-libs libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip
-ENV PHP_BUILD_DIR=/root/php-build
 RUN apk update && apk upgrade && apk add --virtual .php-deps ${PHP_DEPS}
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
@@ -55,3 +54,8 @@ CMD ["--nodaemonize"]
 # Run php docker run --entrypoint=/bin/sh php
 # docker run <fpm args>
 # running container: docker exec -it <container> php -v
+
+
+
+# Can be used via docker-composer 'build: target: development'
+# FROM alpine AS development;
