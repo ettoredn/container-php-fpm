@@ -50,12 +50,8 @@ ADD conf/php.ini /usr/local/etc/php/php.ini
 RUN addgroup -S www-data && adduser -S -D -h /var/www -G www-data www-data
 ENTRYPOINT ["/usr/local/sbin/php-fpm"]
 CMD ["--nodaemonize"]
-
-# Run php docker run --entrypoint=/bin/sh php
-# docker run <fpm args>
-# running container: docker exec -it <container> php -v
-
-
+EXPOSE 9000/tcp
 
 # Can be used via docker-composer 'build: target: development'
 # FROM alpine AS development;
+# kill --signal USR2 1
