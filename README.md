@@ -2,6 +2,8 @@
 
 - php app mounted via bind mount. This is done by docker-compose.
 - CLI executable via `docker exec -it <instance> php`
+- use `/var/www/app` as document root because `/var/www`/ is set as ServerRoot
+
 
 ## Included extensions
 - GD with WebP, PNG, JPEG support
@@ -27,5 +29,6 @@ Should be set via .env for symfony projects. For WP, config is set from the moun
 - create entry.sh script that does whatever magic it needs (e.g. update config files) and then `exec /fpm`. exec is needed so that signals are properly forwarded to the executed process (fpm) which stays in foreground.
 - Add ENV settings to instruct the entry script to start apache and/or load Xdebug. Use env to set the host XDEBUG must connect to.
 - Apache must be added together with mod_rpaf so that it can be used behing nginx when deployed e.g. via Plesk
+- chwon /var/www to www-data
 
 **remember the keep the base image flexible enough to allow both production deployments (unix sockets, no debug, maybe apache)**
