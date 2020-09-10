@@ -36,9 +36,10 @@ CMD ["/bin/sh"]
 
 # Create the image
 FROM alpine AS production
-ENV PHP_DEPS libxml2 openssl sqlite-libs libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip
-ENV HTTP_ROOT /var/www/app
-RUN apk update && apk upgrade && apk add apache2 apache2-proxy && apk add --virtual .php-deps ${PHP_DEPS} && mkdir -p ${HTTP_ROOT}
+RUN apk update && apk upgrade \
+  && apk add --virtual .php-deps libxml2 openssl sqlite-libs libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip \
+  && apk add apache2 apache2-proxy \
+  && mkdir -p /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/php /usr/local/bin/
@@ -50,9 +51,8 @@ ADD conf/php-fpm.conf /usr/local/etc/php-fpm.conf
 ADD conf/php.ini /usr/local/etc/php/php.ini
 ADD conf/apache.conf /etc/apache2/httpd.conf
 ADD entry.sh /usr/local/bin/entry.sh
-#RUN addgroup -S www-data && adduser -S -D -h /var/www -G www-data www-data
 ENTRYPOINT ["/usr/local/bin/entry.sh"]
-CMD ["--nodaemonize"]
+# CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
 
