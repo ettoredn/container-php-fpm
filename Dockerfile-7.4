@@ -5,7 +5,7 @@ FROM php:7.4-fpm-alpine AS builder
 ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
-ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev sqlite-dev libedit-dev bzip2-dev curl-dev libpng-dev libwebp-dev libjpeg-turbo-dev gmp-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev
+ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev libwebp-dev libjpeg-turbo-dev gmp-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev
 ENV PHP_XDEBUG_SRC https://xdebug.org/files/xdebug-2.9.6.tgz
 ENV PHP_APCU_SRC https://github.com/krakjoe/apcu/archive/v5.1.18.tar.gz
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
@@ -18,7 +18,7 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --enable-option-checking=fatal --prefix=/usr/local --build=x86_64-linux-musl --with-config-file-path=/usr/local/etc/php \
   --enable-cli --enable-fpm --with-fpm-user=www-data --with-fpm-group=www-data --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
-  --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd \
+  --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
   --with-zip --with-zlib --with-bz2 \
   --enable-bcmath --with-gmp --enable-mbstring --with-iconv \
   --enable-gd --with-webp --with-jpeg --enable-exif \
@@ -39,7 +39,7 @@ FROM alpine AS production
 ENV APP_DEBUG 0
 ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk update && apk upgrade \
-  && apk add --virtual .php-deps libxml2 openssl sqlite-libs libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip \
+  && apk add --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip \
   && apk add apache2 apache2-proxy \
   && mkdir -p /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
