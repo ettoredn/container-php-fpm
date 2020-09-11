@@ -1,13 +1,10 @@
-# docker build --target builder .
-# Build PHP from source
-FROM php:7.4-fpm-alpine AS builder
-# removed -fpic
+FROM php:8.0.0beta3-fpm-alpine AS builder
 ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
 ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev libwebp-dev libjpeg-turbo-dev gmp-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev
 ENV PHP_APCU_SRC https://github.com/krakjoe/apcu/archive/v5.1.18.tar.gz
-ENV PHP_XDEBUG_SRC https://xdebug.org/files/xdebug-2.9.6.tgz
+ENV PHP_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/master.tar.gz
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN rm -rf /usr/local/lib/php /usr/local/sbin/php-fpm /usr/local/bin/php
 RUN docker-php-source extract
@@ -58,7 +55,3 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 # CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
-
-# Can be used via docker-composer 'build: target: development'
-# FROM alpine AS development;
-# kill --signal USR2 1

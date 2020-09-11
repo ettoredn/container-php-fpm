@@ -1,13 +1,10 @@
-# docker build --target builder .
-# Build PHP from source
-FROM php:7.4-fpm-alpine AS builder
-# removed -fpic
+FROM php:5.6-fpm-alpine AS builder
 ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
-ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev libwebp-dev libjpeg-turbo-dev gmp-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev
-ENV PHP_APCU_SRC https://github.com/krakjoe/apcu/archive/v5.1.18.tar.gz
-ENV PHP_XDEBUG_SRC https://xdebug.org/files/xdebug-2.9.6.tgz
+ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev libressl-dev libedit-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev gmp-dev icu-dev libzip-dev libmcrypt-dev
+ENV PHP_APCU_SRC https://github.com/krakjoe/apcu/archive/v4.0.11.tar.gz
+ENV PHP_XDEBUG_SRC https://xdebug.org/files/xdebug-2.5.5.tgz
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN rm -rf /usr/local/lib/php /usr/local/sbin/php-fpm /usr/local/bin/php
 RUN docker-php-source extract
@@ -17,11 +14,11 @@ WORKDIR /usr/src/php
 RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure \
   --enable-option-checking=fatal --prefix=/usr/local --build=x86_64-linux-musl --with-config-file-path=/usr/local/etc/php \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
-  --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
+  --with-openssl --with-system-ciphers --with-mcrypt \
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
-  --with-zip --with-zlib --with-bz2 \
+  --enable-zip --with-zlib --with-bz2 \
   --enable-bcmath --with-gmp --enable-mbstring --with-iconv \
-  --enable-gd --with-webp --with-jpeg --enable-exif \
+  --with-gd --with-png-dir=/usr --with-jpeg-dir=/usr --enable-exif \
   --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets  --with-curl --with-libedit --enable-intl --enable-calendar  --enable-pcntl
 RUN make --jobs=$( getconf _NPROCESSORS_ONLN ) && make install
 RUN cd /usr/src/apcu && phpize \
@@ -35,11 +32,11 @@ RUN cd /usr/src/xdebug && phpize \
 CMD ["/bin/sh"]
 
 # Create the image
-FROM alpine AS production
+FROM alpine:3.8 AS production
 ENV APP_DEBUG 0
 ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk update && apk upgrade \
-  && apk add --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip \
+  && apk add --virtual .php-deps libxml2 libressl libmcrypt libedit libbz2 libcurl libpng libjpeg-turbo gmp icu-libs libzip \
   && apk add apache2 apache2-proxy \
   && mkdir -p /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
@@ -58,7 +55,3 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 # CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
-
-# Can be used via docker-composer 'build: target: development'
-# FROM alpine AS development;
-# kill --signal USR2 1
