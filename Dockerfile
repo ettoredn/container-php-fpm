@@ -36,6 +36,8 @@ CMD ["/bin/sh"]
 
 # Create the image
 FROM alpine AS production
+ENV APP_DEBUG 0
+ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk update && apk upgrade \
   && apk add --virtual .php-deps libxml2 openssl sqlite-libs libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip \
   && apk add apache2 apache2-proxy \
