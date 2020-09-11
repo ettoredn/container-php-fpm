@@ -51,6 +51,7 @@ ADD conf/php-fpm.conf /usr/local/etc/php-fpm.conf
 ADD conf/php.ini /usr/local/etc/php/php.ini
 ADD conf/apache.conf /etc/apache2/httpd.conf
 ADD entry.sh /usr/local/bin/entry.sh
+ADD reload.sh /usr/local/bin/reload.sh
 ENTRYPOINT ["/usr/local/bin/entry.sh"]
 # CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
