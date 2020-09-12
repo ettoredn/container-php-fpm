@@ -5,6 +5,8 @@
 - Web application root is `/var/www/app`.
 - When using this as base image, add `RUN chwon -R apache:apache /var/www/app` to your Dockerfile.
 - Composer is not included.
+- Extend PHP's settings by adding .ini files to `/usr/local/etc/php/conf.d`.
+- Extend FPM pool's settings by adding .conf files to `/usr/local/etc/php/conf.d`.
 - `REMOTE_ADDR` and `REQUEST_SCHEME` are replaced with `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
 
 ## Bundled Extensions
@@ -12,7 +14,7 @@
 - GD with support for WebP, PNG, JPEG
 - BCMath, GMP, ~~PHP Decimal (wait for next Alpine release)~~
 - OpenSSL, Sodium, Argon2
-- MySQLi, PDO MySQL, PDO SQLite
+- MySQLi, PDO MySQL
 - OPcache, APCu
 
 ## Build steps
