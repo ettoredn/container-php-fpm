@@ -14,8 +14,8 @@ RUN docker-php-source extract
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_APCU_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_XDEBUG_SRC} | tar xzf - --strip-components=1
 WORKDIR /usr/src/php
-RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure \
-  --enable-option-checking=fatal --prefix=/usr/local --build=x86_64-linux-musl --with-config-file-path=/usr/local/etc/php \
+RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure --enable-option-checking=fatal \
+  --prefix=/usr/local --with-config-file-path=/usr/local/etc/php --with-config-file-scan-dir=/usr/local/etc/php/conf.d --build=x86_64-linux-musl \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \

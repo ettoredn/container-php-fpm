@@ -17,7 +17,7 @@
 
 ## Build steps
 
-- `docker build --file Dockerfile-7.4 --tag ghcr.io/themecraftstudio/php-fpm-7.4:latest .`
+- `docker build --file Dockerfile.74 --tag ghcr.io/themecraftstudio/php-fpm-7.4:latest .`
 - `docker push ghcr.io/themecraftstudio/php-fpm-7.4`
 
 ## Notes
