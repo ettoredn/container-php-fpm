@@ -35,9 +35,9 @@ CMD ["/bin/sh"]
 FROM alpine:3.8 AS production
 ENV APP_DEBUG 0
 ENV XDEBUG_REMOTE_HOST host.docker.internal
-RUN apk update && apk upgrade \
-  && apk add --virtual .php-deps libxml2 libressl libmcrypt libedit libbz2 libcurl libpng libjpeg-turbo gmp icu-libs libzip \
-  && apk add apache2 apache2-proxy \
+RUN apk upgrade --no-cache --purge \
+  && apk add --no-cache --virtual .php-deps libxml2 libressl libmcrypt libedit libbz2 libcurl libpng libjpeg-turbo gmp icu-libs libzip \
+  && apk add --no-cache apache2 apache2-proxy \
   && mkdir -p /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
