@@ -22,7 +22,7 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --with-zip --with-zlib --with-bz2 \
   --enable-bcmath --with-gmp --enable-mbstring --with-iconv \
   --enable-gd --with-webp --with-jpeg --enable-exif \
-  --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets  --with-curl --with-libedit --enable-intl --enable-calendar  --enable-pcntl
+  --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets  --with-curl --with-libedit --enable-intl --with-xsl
 RUN make --jobs=$( getconf _NPROCESSORS_ONLN ) && make install
 RUN cd /usr/src/apcu && phpize \
   && ./configure --with-php-config=/usr/local/bin/php-config \
