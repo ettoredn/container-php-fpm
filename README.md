@@ -17,6 +17,11 @@
 - MySQLi, PDO MySQL
 - OPcache, APCu
 
+All aforementioned extensions are enabled by defalt. The following additional extensions are available but disabled by default:
+
+- Xdebug (`-dzend_extension=xdebug.so`)
+- Blackfire PHP Probe (`-dextension=blackfire.so`)
+
 ## Build steps
 
 - `docker build --file Dockerfile.74 --tag ghcr.io/themecraftstudio/php-fpm-7.4:latest .`
@@ -32,3 +37,6 @@
 ## TODOS
 
 - Use APP_DEBUG to toggle Xdebug. Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
+- Use APP_PROFILE=xdebug|blackfire to toggle Blackfire or xdebug.
+- Figure out whether blackfire agent should be bundled or not (hint: not).
+- Bundle Blackfire PHP Probe, see https://blackfire.io/docs/integrations/docker/php-docker
