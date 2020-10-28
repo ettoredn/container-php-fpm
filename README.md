@@ -1,5 +1,7 @@
 # Production-ready PHP-FPM Image for Docker
 
+This build of PHP-FPM is meant to be used in production or staging environments.
+
 - Arguments provided to docker are passed to FPM, e.g. `docker run <image> -dzend_extension=xdebug.so -i`.
 - Execute PHP's cli via `docker exec -it <instance> php`.
 - Web application root is `/var/www/app`.
@@ -11,16 +13,18 @@
 
 ## Bundled Extensions
 
+The following extension are included and *enabled by default*:
+
 - GD with support for WebP, PNG, JPEG
-- BCMath, GMP, ~~PHP Decimal (wait for next Alpine release)~~
+- BCMath, GMP
 - OpenSSL, Sodium, Argon2
 - MySQLi, PDO MySQL
 - OPcache, APCu
 
-All aforementioned extensions are enabled by defalt. The following additional extensions are available but disabled by default:
+Additional extensions are available but *disabled by default*:
 
+- ~~PHP Decimal (wait for next Alpine release)~~
 - Xdebug (`-dzend_extension=xdebug.so`)
-- Blackfire PHP Probe (`-dextension=blackfire.so`)
 
 ## Build steps
 
@@ -37,6 +41,3 @@ All aforementioned extensions are enabled by defalt. The following additional ex
 ## TODOS
 
 - Use APP_DEBUG to toggle Xdebug. Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
-- Use APP_PROFILE=xdebug|blackfire to toggle Blackfire or xdebug.
-- Figure out whether blackfire agent should be bundled or not (hint: not).
-- Bundle Blackfire PHP Probe, see https://blackfire.io/docs/integrations/docker/php-docker
