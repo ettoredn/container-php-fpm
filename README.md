@@ -40,4 +40,5 @@ Additional extensions are available but *disabled by default*:
 
 ## TODOS
 
-- Use APP_DEBUG to toggle Xdebug. Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
+- Remove usage of APP_DEBUG as it is application specific and should be set from the Dockerfile of the web app (e.g. symfony project)
+- Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
