@@ -24,6 +24,7 @@ The following extension are included and *enabled by default*:
 Additional extensions are available but *disabled by default*:
 
 - ~~PHP Decimal (wait for next Alpine release)~~
+- PhpRedis (`-dextension=redis.so`)
 - Xdebug (`-dzend_extension=xdebug.so`)
 
 ## Build steps
