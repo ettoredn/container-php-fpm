@@ -1,5 +1,7 @@
 # Production-ready PHP-FPM Image for Docker
 
+This build of PHP-FPM is meant to be used in production or staging environments.
+
 - Arguments provided to docker are passed to FPM, e.g. `docker run <image> -dzend_extension=xdebug.so -i`.
 - Execute PHP's cli via `docker exec -it <instance> php`.
 - Web application root is `/var/www/app`.
@@ -11,11 +13,19 @@
 
 ## Bundled Extensions
 
+The following extension are included and *enabled by default*:
+
 - GD with support for WebP, PNG, JPEG
-- BCMath, GMP, ~~PHP Decimal (wait for next Alpine release)~~
+- BCMath, GMP
 - OpenSSL, Sodium, Argon2
 - MySQLi, PDO MySQL
 - OPcache, APCu
+
+Additional extensions are available but *disabled by default*:
+
+- ~~PHP Decimal (wait for next Alpine release)~~
+- PhpRedis (`-dextension=redis.so`)
+- Xdebug (`-dzend_extension=xdebug.so`)
 
 ## Build steps
 
@@ -31,4 +41,5 @@
 
 ## TODOS
 
-- Use APP_DEBUG to toggle Xdebug. Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
+- Remove usage of APP_DEBUG as it is application specific and should be set from the Dockerfile of the web app (e.g. symfony project)
+- Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
