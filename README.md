@@ -2,7 +2,7 @@
 
 This build of PHP-FPM is meant to be used in production or staging environments.
 
-- Arguments provided to docker are passed to FPM, e.g. `docker run <image> -dzend_extension=xdebug.so -i`.
+- Arguments provided to docker are passed to FPM, e.g. `docker run <image> -d zend_extension=xdebug.so -i`.
 - Execute PHP's cli via `docker exec -it <instance> php`.
 - Web application root is `/var/www/app`.
 - When using this as base image, add `RUN chwon -R apache:apache /var/www/app` to your Dockerfile.
@@ -41,5 +41,4 @@ Additional extensions are available but *disabled by default*:
 
 ## TODOS
 
-- Remove usage of APP_DEBUG as it is application specific and should be set from the Dockerfile of the web app (e.g. symfony project)
 - Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
