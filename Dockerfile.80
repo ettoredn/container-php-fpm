@@ -37,7 +37,7 @@ ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk upgrade --no-cache --purge \
   && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
   && apk add --no-cache apache2 apache2-proxy \
-  && mkdir -p /var/www/app
+  && mkdir -p /var/www/app && chown apache:apache /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/php /usr/local/bin/

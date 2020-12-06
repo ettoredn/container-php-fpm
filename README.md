@@ -5,10 +5,9 @@ This build of PHP-FPM is meant to be used in production or staging environments.
 - Arguments provided to docker are passed to FPM, e.g. `docker run <image> -d zend_extension=xdebug.so -i`.
 - Execute PHP's cli via `docker exec -it <instance> php`.
 - Web application root is `/var/www/app`.
-- When using this as base image, add `RUN chwon -R apache:apache /var/www/app` to your Dockerfile.
 - Composer is not included.
 - Extend PHP's settings by adding .ini files to `/usr/local/etc/php/conf.d`.
-- Extend FPM pool's settings by adding .conf files to `/usr/local/etc/php/conf.d`.
+- Extend FPM pool's settings by adding .conf files to `/usr/local/etc/php-fpm.d`.
 - `REMOTE_ADDR` and `REQUEST_SCHEME` are replaced with `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
 
 ## Bundled Extensions
