@@ -38,6 +38,7 @@ Additional extensions are available but *disabled by default*:
 - `docker exec -it 9673bb9089f5 php -a`
 - **unix socket on bound mount works only for linux hosts**
 - **host.docker.internal** works only on Docker for Mac
+- Build flags courtesy of ClearLinux https://github.com/clearlinux-pkgs/php
 
 ## TODOS
 
