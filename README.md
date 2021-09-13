@@ -23,6 +23,7 @@ The following extension are included and *enabled by default*:
 Additional extensions are available but *disabled by default*:
 
 - ~~PHP Decimal (wait for next Alpine release)~~
+- imagick (`-dextension=imagick.so)
 - PhpRedis (`-dextension=redis.so`)
 - Xdebug (`-dzend_extension=xdebug.so`)
 
@@ -37,6 +38,7 @@ Additional extensions are available but *disabled by default*:
 - `docker exec -it 9673bb9089f5 php -a`
 - **unix socket on bound mount works only for linux hosts**
 - **host.docker.internal** works only on Docker for Mac
+- Build flags courtesy of ClearLinux https://github.com/clearlinux-pkgs/php
 
 ## TODOS
 
