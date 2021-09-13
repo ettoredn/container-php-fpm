@@ -17,7 +17,7 @@ RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_XDEB
 
 WORKDIR /usr/src/php
 RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
-  --prefix=/usr/local/phpbuild --with-config-file-path=/usr/local/etc/php --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
+  --prefix=/usr/local/build --with-config-file-path=/usr/local/etc/php --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
@@ -27,19 +27,19 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --enable-calendar --enable-intl --enable-pcntl --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets --with-curl --with-libedit --with-xsl 
 RUN make --jobs=$(nproc) && make install
 RUN cd /usr/src/imagick && phpize \
-  && ./configure --with-php-config=/usr/local/phpbuild/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 RUN cd /usr/src/apcu && phpize \
-  && ./configure --with-php-config=/usr/local/phpbuild/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 RUN cd /usr/src/phpredis && phpize \
-  && ./configure --with-php-config=/usr/local/phpbuild/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 RUN cd /usr/src/xdebug && phpize \
-  && ./configure --with-php-config=/usr/local/phpbuild/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 
@@ -49,16 +49,16 @@ CMD ["/bin/sh"]
 FROM alpine
 ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk upgrade --no-cache --purge \
-  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libwebp libjpeg-turbo imagemagick gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
-  && apk add --no-cache dhcpcd apache2 apache2-proxy \
+  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
+  && apk add --no-cache apache2 apache2-proxy \
   && mkdir -p /var/www/app && chown apache:apache /var/www/app
-COPY --from=builder /usr/local/phpbuild/bin/phar /usr/local/bin/
-COPY --from=builder /usr/local/phpbuild/bin/phar.phar /usr/local/bin/
-COPY --from=builder /usr/local/phpbuild/bin/php /usr/local/bin/
-COPY --from=builder /usr/local/phpbuild/bin/php-config /usr/local/bin/
-COPY --from=builder /usr/local/phpbuild/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY --from=builder /usr/local/phpbuild/sbin/php-fpm /usr/local/sbin/
-COPY --from=builder /usr/local/phpbuild/etc/php-fpm.d/docker.conf /usr/local/etc/php-fpm.d/docker.conf
+COPY --from=builder /usr/local/build/bin/phar /usr/local/bin/
+COPY --from=builder /usr/local/build/bin/phar.phar /usr/local/bin/
+COPY --from=builder /usr/local/build/bin/php /usr/local/bin/
+COPY --from=builder /usr/local/build/bin/php-config /usr/local/bin/
+COPY --from=builder /usr/local/build/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=builder /usr/local/build/sbin/php-fpm /usr/local/sbin/
+COPY --from=builder /usr/local/etc/php-fpm.d/docker.conf /usr/local/etc/php-fpm.d/docker.conf
 ADD conf/php-fpm.conf /usr/local/etc/php-fpm.conf
 ADD conf/php.ini /usr/local/etc/php/php.ini
 ADD conf/apache.conf /etc/apache2/httpd.conf

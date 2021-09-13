@@ -14,7 +14,7 @@ This build of PHP-FPM is meant to be used in production or staging environments.
 
 The following extension are included and *enabled by default*:
 
-- Imagick with support for WebP
+- GD
 - BCMath, GMP
 - OpenSSL, Sodium, Argon2
 - MySQLi, PDO MySQL
@@ -23,9 +23,9 @@ The following extension are included and *enabled by default*:
 Additional extensions are available but *disabled by default*:
 
 - ~~PHP Decimal (wait for next Alpine release)~~
-- imagick (`-dextension=imagick.so)
-- PhpRedis (`-dextension=redis.so`)
-- Xdebug (`-dzend_extension=xdebug.so`)
+- [imagick](https://github.com/Imagick/imagick) (`-dextension=imagick.so)
+- [PhpRedis](https://github.com/phpredis/phpredis) (`-dextension=redis.so`) !! requires additional build step `apk add imagemagick` (+114 MB)
+- [Xdebug](https://xdebug.org/) (`-dzend_extension=xdebug.so`)
 
 ## Build steps
 
@@ -35,6 +35,7 @@ Additional extensions are available but *disabled by default*:
 ## Notes
 
 - `docker build -f /path/to/a/Dockerfile .` builds an image from Dockerfile using the context (files) at ". "
+- `docker build -f Dockerfile.81 --target builder --tag builder-81 .` builds the intermediary builder image.
 - `docker exec -it 9673bb9089f5 php -a`
 - **unix socket on bound mount works only for linux hosts**
 - **host.docker.internal** works only on Docker for Mac
