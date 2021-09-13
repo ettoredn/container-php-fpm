@@ -28,11 +28,8 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --enable-gd --enable-exif \
   --enable-calendar --enable-intl --enable-pcntl --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets --with-curl --with-libedit --with-xsl 
 RUN make --jobs=$(nproc) && make install
+ENV PATH /usr/local/build/bin/:${PATH}
 RUN cd /usr/src/apcu && phpize \
-  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
-  && make --jobs=$(nproc) \
-  && make install
-RUN cd /usr/src/phpdecimal && phpize \
   && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
