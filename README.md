@@ -14,7 +14,7 @@ This build of PHP-FPM is meant to be used in production or staging environments.
 
 The following extension are included and *enabled by default*:
 
-- GD with support for WebP, PNG, JPEG
+- Imagick with support for WebP
 - BCMath, GMP
 - OpenSSL, Sodium, Argon2
 - MySQLi, PDO MySQL
@@ -28,8 +28,8 @@ Additional extensions are available but *disabled by default*:
 
 ## Build steps
 
-- `docker build --file Dockerfile.74 --tag ghcr.io/themecraftstudio/php-fpm-7.4:latest .`
-- `docker push ghcr.io/themecraftstudio/php-fpm-7.4`
+- `docker build --file Dockerfile.81 --tag ghcr.io/themecraftstudio/php-fpm:8.1 .`
+- `docker push ghcr.io/themecraftstudio/php-fpm:8.1`
 
 ## Notes
 
@@ -41,3 +41,4 @@ Additional extensions are available but *disabled by default*:
 ## TODOS
 
 - Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
+- Allow extending Apache config via includes
