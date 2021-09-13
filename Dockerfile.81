@@ -2,18 +2,20 @@ FROM php:8.1-rc-fpm-alpine AS builder
 ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
-ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev imagemagick-dev gmp-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
-ENV PHP_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.20.tar.gz
-ENV PHP_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.0beta2.tar.gz
-ENV PHP_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.5.1.tar.gz
-ENV PHP_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.4.tar.gz
+ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
+ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.20.tar.gz
+ENV PHP_EXT_DECIMAL_SRC https://github.com/php-decimal/ext-decimal/archive/refs/tags/v1.2.0.tar.gz
+ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.4.tar.gz
+ENV PHP_EXT_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.5.1.tar.gz
+ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.0beta2.tar.gz
 
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
-RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_IMAGICK_SRC} | tar xzf - --strip-components=1
-RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_APCU_SRC} | tar xzf - --strip-components=1
-RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_REDIS_SRC} | tar xzf - --strip-components=1
-RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_XDEBUG_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/phpdecimal && cd /usr/src/phpdecimal && curl --location ${PHP_EXT_DECIMAL_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_EXT_IMAGICK_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_XDEBUG_SRC} | tar xzf - --strip-components=1
 
 WORKDIR /usr/src/php
 RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
@@ -26,15 +28,19 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --enable-gd --enable-exif \
   --enable-calendar --enable-intl --enable-pcntl --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets --with-curl --with-libedit --with-xsl 
 RUN make --jobs=$(nproc) && make install
-RUN cd /usr/src/imagick && phpize \
-  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
-  && make --jobs=$(nproc) \
-  && make install
 RUN cd /usr/src/apcu && phpize \
   && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
+RUN cd /usr/src/phpdecimal && phpize \
+  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
 RUN cd /usr/src/phpredis && phpize \
+  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
+  RUN cd /usr/src/imagick && phpize \
   && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
@@ -68,3 +74,4 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 # CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
+LABEL org.opencontainers.image.source https://github.com/themecraftstudio/docker-php-fpm

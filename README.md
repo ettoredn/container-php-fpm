@@ -22,7 +22,7 @@ The following extension are included and *enabled by default*:
 
 Additional extensions are available but *disabled by default*:
 
-- ~~PHP Decimal (wait for next Alpine release)~~
+- [PHP Decimal](http://php-decimal.io/) (`-dextension=decimal.so`)
 - [imagick](https://github.com/Imagick/imagick) (`-dextension=imagick.so)
 - [PhpRedis](https://github.com/phpredis/phpredis) (`-dextension=redis.so`) !! requires additional build step `apk add imagemagick` (+114 MB)
 - [Xdebug](https://xdebug.org/) (`-dzend_extension=xdebug.so`)
