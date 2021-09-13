@@ -11,6 +11,7 @@ ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.0b
 
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
+RUN rm -rf /usr/local/bin/p* /usr/local/sbin/* /usr/local/lib/php
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpdecimal && cd /usr/src/phpdecimal && curl --location ${PHP_EXT_DECIMAL_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
@@ -19,7 +20,7 @@ RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_
 
 WORKDIR /usr/src/php
 RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
-  --prefix=/usr/local/build --with-config-file-path=/usr/local/etc/php --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
+  --prefix=/usr/local --with-config-file-path=/usr/local/etc/php --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
@@ -28,21 +29,20 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --enable-gd --enable-exif \
   --enable-calendar --enable-intl --enable-pcntl --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets --with-curl --with-libedit --with-xsl 
 RUN make --jobs=$(nproc) && make install
-ENV PATH /usr/local/build/bin/:${PATH}
 RUN cd /usr/src/apcu && phpize \
-  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 RUN cd /usr/src/phpredis && phpize \
-  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
   RUN cd /usr/src/imagick && phpize \
-  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 RUN cd /usr/src/xdebug && phpize \
-  && ./configure --with-php-config=/usr/local/build/bin/php-config --enable-option-checking=fatal \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
 
@@ -52,15 +52,15 @@ CMD ["/bin/sh"]
 FROM alpine
 ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk upgrade --no-cache --purge \
-  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libwebp libjpeg-turbo gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
+  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libgomp gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
   && apk add --no-cache apache2 apache2-proxy \
   && mkdir -p /var/www/app && chown apache:apache /var/www/app
-COPY --from=builder /usr/local/build/bin/phar /usr/local/bin/
-COPY --from=builder /usr/local/build/bin/phar.phar /usr/local/bin/
-COPY --from=builder /usr/local/build/bin/php /usr/local/bin/
-COPY --from=builder /usr/local/build/bin/php-config /usr/local/bin/
-COPY --from=builder /usr/local/build/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY --from=builder /usr/local/build/sbin/php-fpm /usr/local/sbin/
+COPY --from=builder /usr/local/bin/phar /usr/local/bin/
+COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
+COPY --from=builder /usr/local/bin/php /usr/local/bin/
+COPY --from=builder /usr/local/bin/php-config /usr/local/bin/
+COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=builder /usr/local/sbin/php-fpm /usr/local/sbin/
 COPY --from=builder /usr/local/etc/php-fpm.d/docker.conf /usr/local/etc/php-fpm.d/docker.conf
 ADD conf/php-fpm.conf /usr/local/etc/php-fpm.conf
 ADD conf/php.ini /usr/local/etc/php/php.ini
