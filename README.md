@@ -23,7 +23,7 @@ The following extension are included and *enabled by default*:
 Additional extensions are available but *disabled by default*:
 
 - ~~[PHP Decimal](http://php-decimal.io/)~~ (`-dextension=decimal.so`) waiting for PHP 8 support [#43](https://github.com/php-decimal/ext-decimal/issues/43)
-- [imagick](https://github.com/Imagick/imagick) (`-dextension=imagick.so) !! requires additional build step `apk add imagemagick` (+114 MB)
+- [imagick](https://github.com/Imagick/imagick) (`-dextension=imagick.so`) !! requires additional build step `apk add imagemagick` (+114 MB)
 - [PhpRedis](https://github.com/phpredis/phpredis) (`-dextension=redis.so`)
 - [Xdebug](https://xdebug.org/) (`-dzend_extension=xdebug.so`)
 
