@@ -1,15 +1,17 @@
+# docker build --file Dockerfile.81 --tag ghcr.io/themecraftstudio/php-fpm:8.1 .
+
 FROM php:8.1-rc-fpm-alpine AS builder
 ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
 ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
-ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.20.tar.gz
+RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
+
+ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/heads/master.tar.gz
 ENV PHP_EXT_DECIMAL_SRC https://github.com/php-decimal/ext-decimal/archive/refs/tags/v1.2.0.tar.gz
 ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.4.tar.gz
 ENV PHP_EXT_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.5.1.tar.gz
 ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.0beta2.tar.gz
-
-RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
 RUN rm -rf /usr/local/bin/p* /usr/local/sbin/* /usr/local/lib/php
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
@@ -20,7 +22,7 @@ RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_
 
 WORKDIR /usr/src/php
 RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
-  --prefix=/usr/local --with-config-file-path=/usr/local/etc/php --with-config-file-scan-dir=/usr/local/etc/php/conf.d \
+  --prefix=/usr/local --with-config-file-path=/etc/php --with-config-file-scan-dir=/etc/php/conf.d \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
@@ -61,9 +63,9 @@ COPY --from=builder /usr/local/bin/php /usr/local/bin/
 COPY --from=builder /usr/local/bin/php-config /usr/local/bin/
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=builder /usr/local/sbin/php-fpm /usr/local/sbin/
-COPY --from=builder /usr/local/etc/php-fpm.d/docker.conf /usr/local/etc/php-fpm.d/docker.conf
-ADD conf/php-fpm.conf /usr/local/etc/php-fpm.conf
-ADD conf/php.ini /usr/local/etc/php/php.ini
+COPY --from=builder /usr/local/etc/php-fpm.d/docker.conf /etc/php-fpm.d/docker.conf
+ADD conf/php-fpm.conf /etc/php/php-fpm.conf
+ADD conf/php.ini /etc/php/php.ini
 ADD conf/apache.conf /etc/apache2/httpd.conf
 ADD entry.sh /usr/local/bin/docker-entry.sh
 ADD reload.sh /usr/local/bin/reload.sh

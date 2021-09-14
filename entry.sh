@@ -19,4 +19,4 @@ chown -R apache:apache /var/www/app
 httpd -k start
 
 # Run FPM via exec. 
-exec /usr/local/sbin/php-fpm "$@"
+exec /usr/local/sbin/php-fpm --fpm-config /etc/php/php-fpm.conf $@
