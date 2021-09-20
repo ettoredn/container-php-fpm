@@ -4,7 +4,7 @@ FROM php:8.1-rc-fpm-alpine AS builder
 ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
-ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
+ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 
 ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/heads/master.tar.gz
@@ -28,7 +28,7 @@ RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" .
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
   --with-zip --with-zlib --with-bz2 \
   --enable-bcmath --with-gmp --enable-mbstring --with-iconv \
-  --enable-gd --enable-exif \
+  --enable-gd --with-jpeg --with-webp --enable-exif \
   --enable-calendar --enable-intl --enable-pcntl --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets --with-curl --with-libedit --with-xsl 
 RUN make --jobs=$(nproc) && make install
 RUN cd /usr/src/apcu && phpize \
@@ -54,7 +54,7 @@ CMD ["/bin/sh"]
 FROM alpine
 ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk upgrade --no-cache --purge \
-  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libgomp gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
+  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
   && apk add --no-cache apache2 apache2-proxy \
   && mkdir -p /var/www/app && chown apache:apache /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
