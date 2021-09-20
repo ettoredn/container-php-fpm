@@ -14,7 +14,7 @@ This build of PHP-FPM is meant to be used in production or staging environments.
 
 The following extension are included and *enabled by default*:
 
-- GD
+- GD with support for PNG and JPEG
 - BCMath, GMP
 - OpenSSL, Sodium, Argon2
 - MySQLi, PDO MySQL
