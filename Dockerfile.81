@@ -1,7 +1,7 @@
 # docker build --file Dockerfile.81 --tag ghcr.io/themecraftstudio/php-fpm:8.1 .
 
 FROM php:8.1-rc-fpm-alpine AS builder
-ENV PHP_CFLAGS -fstack-protector-strong -fpie -O3 -fno-trapping-math -fno-semantic-interposition -falign-functions=32 -fno-lto -fno-math-errno -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+ENV PHP_CFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -march=x86-64-v3 -mprefer-vector-width=256
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
 ENV PHP_LDFLAGS -Wl,-O1 -pie
 ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
