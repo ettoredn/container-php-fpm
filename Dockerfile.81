@@ -3,14 +3,13 @@
 FROM php:8.1-rc-fpm-alpine AS builder
 ENV PHP_CFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -march=x86-64 -mprefer-vector-width=256
 ENV PHP_CPPFLAGS ${PHP_CFLAGS}
-ENV PHP_LDFLAGS -Wl,-O1
 ENV PHP_BUILD_DEPS git autoconf dpkg-dev dpkg file g++ gcc libc-dev make pkgconf re2c libxml2-dev openssl-dev libedit-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libzip-dev libxslt-dev
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
 
 WORKDIR /usr/src/php
 RUN rm -rf /usr/local/bin/p* /usr/local/sbin/* /usr/local/lib/php
-RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" LDFLAGS="${PHP_LDFLAGS}" ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
+RUN CFLAGS="${PHP_CFLAGS}" CPPFLAGS="${PHP_CPPFLAGS}" ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
   --prefix=/usr/local --with-config-file-path=/etc/php --with-config-file-scan-dir=/etc/php/conf.d \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
