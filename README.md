@@ -45,3 +45,8 @@ Additional extensions are available but *disabled by default*:
 
 - Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
 - Allow extending Apache config via includes
+
+## References
+
+- https://gitlab.alpinelinux.org/alpine/aports/-/issues/10627
+- https://clang.llvm.org/docs/Toolchain.html
