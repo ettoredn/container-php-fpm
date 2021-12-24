@@ -1,9 +1,9 @@
 # docker build --file Dockerfile.81 --tag ghcr.io/themecraftstudio/php-fpm:8.1 .
 
-FROM php:8.1-rc-fpm-alpine AS builder
+FROM php:8.1-fpm-alpine AS builder
 
 ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -march=x86-64 -mprefer-vector-width=256
-ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev oniguruma-dev libsodium-dev argon2-dev libxslt-dev
+ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
 
@@ -13,7 +13,7 @@ RUN ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
   --prefix=/usr/local --with-config-file-path=/etc/php --with-config-file-scan-dir=/etc/php/conf.d \
   --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
-  --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --without-sqlite3 --without-pdo-sqlite \
+  --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-pgsql --without-sqlite3 --without-pdo-sqlite \
   --with-zip --with-zlib --with-bz2 \
   --enable-bcmath --with-gmp --enable-mbstring --with-iconv \
   --enable-gd --with-jpeg --with-webp --enable-exif \
@@ -21,11 +21,11 @@ RUN ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
 RUN make --jobs=$(nproc)
 RUN make install
 
-ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/heads/master.tar.gz
-ENV PHP_EXT_DECIMAL_SRC https://github.com/php-decimal/ext-decimal/archive/refs/tags/v1.2.0.tar.gz
-ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.4.tar.gz
+ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.21.tar.gz
+ENV PHP_EXT_DECIMAL_SRC https://github.com/php-decimal/ext-decimal/archive/refs/heads/master.tar.gz
+ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.5.tar.gz
 ENV PHP_EXT_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.5.1.tar.gz
-ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.0beta2.tar.gz
+ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.2.tar.gz
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpdecimal && cd /usr/src/phpdecimal && curl --location ${PHP_EXT_DECIMAL_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
@@ -40,7 +40,7 @@ RUN cd /usr/src/phpredis && phpize \
   && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
-  RUN cd /usr/src/imagick && phpize \
+RUN cd /usr/src/imagick && phpize \
   && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
@@ -52,10 +52,10 @@ RUN cd /usr/src/xdebug && phpize \
 ENTRYPOINT ["/bin/sh"]
 
 # Create the image
-FROM alpine
+FROM alpine:3.15
 ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk upgrade --no-cache --purge \
-  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs oniguruma libsodium argon2-libs libzip libxslt \
+  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs libzip libxslt oniguruma libsodium argon2-libs libpq \
   && apk add --no-cache apache2 apache2-proxy \
   && mkdir -p /var/www/app && chown apache:apache /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
@@ -75,3 +75,4 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
 LABEL org.opencontainers.image.source https://github.com/themecraftstudio/docker-php-fpm
+LABEL org.opencontainers.image.description Production-ready PHP-FPM image for containerized web apps

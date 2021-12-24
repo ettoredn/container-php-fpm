@@ -8,6 +8,7 @@ This build of PHP-FPM is meant to be used in production or staging environments.
 - Composer is not included.
 - Extend PHP's settings by adding .ini files to `/etc/php/conf.d`.
 - Extend FPM pool's settings by adding .conf files to `/etc/php-fpm.d`.
+- Extend/override Apache settings via `/etc/apache2/conf.d/app.conf`.
 - `REMOTE_ADDR` and `REQUEST_SCHEME` are replaced with `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
 
 ## Bundled Extensions
@@ -17,7 +18,7 @@ The following extension are included and *enabled by default*:
 - GD with support for PNG, JPEG and WebP
 - BCMath, GMP
 - OpenSSL, Sodium, Argon2
-- MySQLi, PDO MySQL
+- PDO PostgreSQL/MySQL, MySQLi
 - OPcache, APCu
 
 Additional extensions are available but *disabled by default*:
