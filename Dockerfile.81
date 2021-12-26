@@ -4,7 +4,7 @@ FROM php:8.1-fpm-alpine AS builder
 
 ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
-                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev mpdecimal-dev icu-dev \
+                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev icu-dev \
                     libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
@@ -24,12 +24,10 @@ RUN make --jobs=$(nproc)
 RUN make install
 
 ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.21.tar.gz
-#ENV PHP_EXT_DECIMAL_SRC https://github.com/php-decimal/ext-decimal/archive/refs/heads/master.tar.gz
 ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.5.tar.gz
 ENV PHP_EXT_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.5.1.tar.gz
 ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.2.tar.gz
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
-#RUN mkdir -p /usr/src/phpdecimal && cd /usr/src/phpdecimal && curl --location ${PHP_EXT_DECIMAL_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_EXT_IMAGICK_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_XDEBUG_SRC} | tar xzf - --strip-components=1
