@@ -14,12 +14,6 @@ error() {
 GATEWAY_IP=$( ip route list | egrep default | cut -d" " -f3 )
 export HOST="${HOST:-$GATEWAY_IP}"
 
-# Updates ownership for volumes mounted inside the web root
-chown -R apache:apache /var/www/app
-
-# TODO add a user matching the user id on the host. Then run apache and FPM with the newly created user.
-
-
 # Starts Apache, unless --disable-apache
 httpd -k start
 
