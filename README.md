@@ -1,4 +1,4 @@
-# Production-ready PHP-FPM Image for Docker
+# Production-ready PHP-FPM container image
 
 This build of PHP-FPM is meant to be used in production or staging environments.
 
@@ -10,6 +10,7 @@ This build of PHP-FPM is meant to be used in production or staging environments.
 - Extend FPM pool's settings by adding .conf files to `/etc/php-fpm.d`.
 - Extend/override Apache settings via `/etc/apache2/conf.d/app.conf`.
 - `REMOTE_ADDR` and `REQUEST_SCHEME` are replaced with `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
+- The `HTTPS` header is automatically set to `on` for every request having `X_FORWARDED_PROTO == 'https'`
 
 ## Bundled Extensions
 
@@ -23,7 +24,6 @@ The following extension are included and *enabled by default*:
 
 Additional extensions are available but *disabled by default*:
 
-- ~~[PHP Decimal](http://php-decimal.io/)~~ (`-dextension=decimal.so`) waiting for PHP 8 support [#43](https://github.com/php-decimal/ext-decimal/issues/43)
 - [imagick](https://github.com/Imagick/imagick) (`-dextension=imagick.so`) !! requires additional build step `apk add imagemagick` (+114 MB)
 - [PhpRedis](https://github.com/phpredis/phpredis) (`-dextension=redis.so`)
 - [Xdebug](https://xdebug.org/) (`-dzend_extension=xdebug.so`)
@@ -45,7 +45,6 @@ Additional extensions are available but *disabled by default*:
 ## TODOS
 
 - Use XDEBUG_REMOTE_HOST to set the remote host to connect to.
-- Allow extending Apache config via includes
 
 ## References
 
