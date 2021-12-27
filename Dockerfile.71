@@ -3,6 +3,7 @@
 FROM php:7.1-fpm-alpine AS builder
 
 ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64
+ENV LDFLAGS -s
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev gmp-dev icu-dev oniguruma-dev libxslt-dev
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract

@@ -3,6 +3,7 @@
 FROM php:8.1-fpm-alpine AS builder
 
 ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64-v3
+ENV LDFLAGS -s
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
                     bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev icu-dev \
                     libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev
@@ -79,5 +80,5 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 #CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
-LABEL org.opencontainers.image.source https://github.com/themecraftstudio/docker-php-fpm
+LABEL org.opencontainers.image.source https://github.com/themecraftstudio/container-php-fpm
 LABEL org.opencontainers.image.description Production-ready PHP-FPM image for containerized web apps
