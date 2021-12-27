@@ -2,10 +2,15 @@
 
 FROM php:8.1-fpm-alpine AS builder
 
-ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64
+ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64-v3
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
                     bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev icu-dev \
                     libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev
+
+# Upgrade to edge which provides GCC 11.2
+RUN echo -e "https://dl-cdn.alpinelinux.org/alpine/edge/main\nhttps://dl-cdn.alpinelinux.org/alpine/edge/community" > /etc/apk/repositories
+RUN apk update && apk add --upgrade apk-tools && apk upgrade --available
+
 RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
 RUN docker-php-source extract
 
@@ -52,7 +57,7 @@ RUN cd /usr/src/xdebug && phpize \
 ENTRYPOINT ["/bin/sh"]
 
 # Create the image
-FROM alpine:3.15
+FROM alpine:edge
 #ENV XDEBUG_REMOTE_HOST host.docker.internal
 RUN apk upgrade --no-cache --purge \
   && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs libzip libxslt oniguruma libsodium argon2-libs libpq \
