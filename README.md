@@ -1,4 +1,4 @@
-# Production-ready PHP-FPM container image
+# Performance optimized PHP-FPM container image
 
 Alpine based performance optimized build of PHP-FPM for containerized production environments.
 
