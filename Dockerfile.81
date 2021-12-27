@@ -1,4 +1,5 @@
 # docker build --file Dockerfile.81 --tag ghcr.io/themecraftstudio/php-fpm:8.1 .
+# docker push ghcr.io/themecraftstudio/php-fpm:8.1
 
 FROM php:8.1-fpm-alpine AS builder
 
@@ -80,5 +81,6 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 #CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
-LABEL org.opencontainers.image.source https://github.com/themecraftstudio/container-php-fpm
+
+LABEL org.opencontainers.image.source https://github.com/ettoredn/container-php-fpm
 LABEL org.opencontainers.image.description Production-ready PHP-FPM image for containerized web apps

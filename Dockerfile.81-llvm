@@ -88,4 +88,4 @@ ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
 # CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp
-LABEL org.opencontainers.image.source https://github.com/themecraftstudio/docker-php-fpm
+LABEL org.opencontainers.image.source https://github.com/ettoredn/container-php-fpm
