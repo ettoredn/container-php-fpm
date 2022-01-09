@@ -1,4 +1,4 @@
-# docker build --file Dockerfile.71 --tag ghcr.io/themecraftstudio/php-fpm:7.1 .
+# docker build --file Containerfile.71 --tag ghcr.io/themecraftstudio/php-fpm:7.1 .
 
 FROM php:7.1-fpm-alpine AS builder
 

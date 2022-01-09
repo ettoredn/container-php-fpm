@@ -35,6 +35,7 @@ Additional extensions are available but *disabled by default*:
 
 ## TODOS
 
+- configure `ssmtp` (no local queue) for outbound mail assuming `$HOST` or use a fixed dns given by command line
 - Investigate xdebug usage (via XDEBUG_REMOTE_HOST to set the remote host to connect to).
 
 ## References

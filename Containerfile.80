@@ -1,4 +1,4 @@
-# docker build --file Dockerfile.80 --tag ghcr.io/themecraftstudio/php-fpm:8.0 .
+# docker build --file Containerfile.80 --tag ghcr.io/themecraftstudio/php-fpm:8.0 .
 # docker push ghcr.io/themecraftstudio/php-fpm:8.0
 
 FROM php:8.0-fpm-alpine AS builder
