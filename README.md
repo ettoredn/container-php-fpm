@@ -9,7 +9,7 @@ Alpine based performance optimized build of PHP-FPM for containerized production
 - Extend/override Apache settings via `/etc/apache2/conf.d/app.conf`.
 - `REMOTE_ADDR` and `REQUEST_SCHEME` HTTP headers are populated from `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
 - The `HTTPS` HTTP header is set to `on` for every request having `X_FORWARDED_PROTO == 'https'`.
-- SSH access can be enabled by installing dropbear (`apk add --no-cache dropbear`) and setting root's pubkey using the appropriate environment variable (see below)
+- SSH access can be enabled by installing dropbear (`apk add --no-cache dropbear`) and setting root's pubkey using the appropriate environment variable (see below). Password authentication is disabled.
 
 ## Environment variables
 
