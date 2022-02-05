@@ -23,7 +23,7 @@ Alpine based performance optimized build of PHP-FPM for containerized production
 | `SSHD_PORT`              | `22`                          | if dropbear is installed      |
 | `SSHD_AUTH_PUBKEY`       |                               | if dropbear is installed      |
 
-## Bundled Extensions
+## Bundled extensions
 
 The following extension are included and *enabled by default*:
 
