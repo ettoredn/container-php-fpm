@@ -75,9 +75,9 @@ COPY --from=builder /usr/local/etc/php-fpm.d/docker.conf /etc/php-fpm.d/docker.c
 ADD conf/php-fpm.conf /etc/php/php-fpm.conf
 ADD conf/php.ini /etc/php/php.ini
 ADD conf/apache.conf /etc/apache2/httpd.conf
-ADD entry.sh /usr/local/bin/docker-entry.sh
+ADD entry.sh /usr/local/bin/container-entry.sh
 ADD reload.sh /usr/local/bin/reload.sh
-ENTRYPOINT ["/usr/local/bin/docker-entry.sh"]
+ENTRYPOINT ["/usr/local/bin/container-entry.sh"]
 #CMD ["--nodaemonize"]
 EXPOSE 9000/tcp
 EXPOSE 80/tcp

@@ -12,6 +12,18 @@ Alpine based performance optimized build of PHP-FPM for containerized production
 - `REMOTE_ADDR` and `REQUEST_SCHEME` HTTP headers are populated from `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
 - The `HTTPS` HTTP header is set to `on` for every request having `X_FORWARDED_PROTO == 'https'`.
 
+## Environment variables
+
+| NAME                     | DEFAULT                       | DESCRIPTION                   |
+| :----------------------- | :---------------------------- | :---------------------------- |
+| `HOST`                   | default gateway               | Hostddress                    |
+| `HTTPD_PORT`             | `80`                          |                               |
+| `HTTPD_ROOT`             | `/var/www/app`                |                               |
+| `HTTPD_SERVERNAME`       | `$HOSTNAME` or `localhost`    |                               |
+| `HTTPD_REALIP_HEADER`    |   `X-Forwarded-For`           |                               |
+| `SSHD_PORT`              | `22`                          | if dropbear is installed      |
+| `SSHD_AUTH_PUBKEY`       |                               | if dropbear is installed      |
+
 ## Bundled Extensions
 
 The following extension are included and *enabled by default*:
