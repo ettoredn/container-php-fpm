@@ -15,7 +15,7 @@ Alpine based performance optimized build of PHP-FPM for containerized production
 
 | NAME                     | DEFAULT                       | DESCRIPTION                   |
 | :----------------------- | :---------------------------- | :---------------------------- |
-| `HOST`                   | default gateway               | Hostddress                    |
+| `HOST`                   | default gateway               | Host address                  |
 | `HTTPD_PORT`             | `80`                          |                               |
 | `HTTPD_ROOT`             | `/var/www/app`                |                               |
 | `HTTPD_SERVERNAME`       | `$HOSTNAME` or `localhost`    |                               |
