@@ -4,27 +4,26 @@ Alpine based performance optimized build of PHP-FPM for containerized production
 
 - Arguments provided to docker are passed to FPM, e.g. `docker run <image> -d zend_extension=xdebug.so -i`.
 - Execute PHP's cli via `docker exec -it <instance> php`.
-- Web application root is `/var/www/app`.
-- Composer is not included.
 - Extend PHP's settings by adding .ini files to `/etc/php/conf.d`.
 - Extend FPM pool's settings by adding .conf files to `/etc/php-fpm.d`.
 - Extend/override Apache settings via `/etc/apache2/conf.d/app.conf`.
 - `REMOTE_ADDR` and `REQUEST_SCHEME` HTTP headers are populated from `X_FORWARDED_FOR` and `X_FORWARDED_PROTO`, respectively.
 - The `HTTPS` HTTP header is set to `on` for every request having `X_FORWARDED_PROTO == 'https'`.
+- SSH access can be enabled by installing dropbear (`apk add --no-cache dropbear`) and setting root's pubkey using the appropriate environment variable (see below). Password authentication is disabled.
 
 ## Environment variables
 
 | NAME                     | DEFAULT                       | DESCRIPTION                   |
 | :----------------------- | :---------------------------- | :---------------------------- |
-| `HOST`                   | default gateway               | Hostddress                    |
+| `HOST`                   | default gateway               | Host address                  |
 | `HTTPD_PORT`             | `80`                          |                               |
 | `HTTPD_ROOT`             | `/var/www/app`                |                               |
 | `HTTPD_SERVERNAME`       | `$HOSTNAME` or `localhost`    |                               |
-| `HTTPD_REALIP_HEADER`    |   `X-Forwarded-For`           |                               |
+| `HTTPD_REALIP_HEADER`    | `X-Forwarded-For`             |                               |
 | `SSHD_PORT`              | `22`                          | if dropbear is installed      |
 | `SSHD_AUTH_PUBKEY`       |                               | if dropbear is installed      |
 
-## Bundled Extensions
+## Bundled extensions
 
 The following extension are included and *enabled by default*:
 
