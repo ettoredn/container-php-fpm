@@ -26,7 +26,7 @@ Alpine based performance optimized build of PHP-FPM for containerized production
 
 ## Bundled extensions
 
-The following extension are included and *enabled by default*:
+The following extensions are included and *enabled by default*:
 
 - GD with support for PNG, JPEG and WebP
 - BCMath, GMP
