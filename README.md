@@ -42,7 +42,7 @@ Additional extensions are available but *disabled by default*:
 
 ## Notes
 
-- `docker build -f Dockerfile.81 --target builder --tag builder-81 .` builds the intermediary builder image.
+- `docker build -f Containerfile.81 --target builder --tag builder-81 .` builds the intermediary builder image.
 - Build flags courtesy of [ClearLinux's PHP package](https://github.com/clearlinux-pkgs/php/blob/master/php.spec#L186)
 
 ## TODOS
