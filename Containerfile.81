@@ -31,9 +31,9 @@ RUN make --jobs=$(nproc)
 RUN make install
 
 ENV PHP_EXT_APCU_SRC https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.21.tar.gz
-ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.5.tar.gz
-ENV PHP_EXT_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.5.1.tar.gz
-ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.2.tar.gz
+ENV PHP_EXT_REDIS_SRC https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz
+ENV PHP_EXT_IMAGICK_SRC https://github.com/Imagick/imagick/archive/refs/tags/3.7.0.tar.gz
+ENV PHP_EXT_XDEBUG_SRC https://github.com/xdebug/xdebug/archive/refs/tags/3.1.3.tar.gz
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_EXT_IMAGICK_SRC} | tar xzf - --strip-components=1
