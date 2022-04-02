@@ -1,6 +1,6 @@
 # Performance optimized PHP-FPM container image
 
-Alpine based performance optimized build of PHP-FPM for containerized production environments.
+Alpine-based performance optimized build of PHP-FPM for containerized production environments.
 
 - Arguments provided to docker are passed to FPM, e.g. `docker run <image> -d zend_extension=xdebug.so -i`.
 - Execute PHP's cli via `docker exec -it <instance> php`.
