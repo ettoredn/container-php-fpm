@@ -45,7 +45,7 @@ Additional extensions are available but *disabled by default*:
 - `docker build -f Containerfile.81 --target builder --tag builder-81 .` builds the intermediary builder image.
 - Build flags courtesy of [ClearLinux's PHP package](https://github.com/clearlinux-pkgs/php/blob/master/php.spec#L186)
 
-## TODOS
+## TODO
 
 - configure `ssmtp` (no local queue) for outbound mail assuming `$HOST` or use a fixed dns given by command line
 - Investigate xdebug usage (via XDEBUG_REMOTE_HOST to set the remote host to connect to).
