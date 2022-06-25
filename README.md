@@ -47,7 +47,7 @@ Additional extensions are available but *disabled by default*:
 
 ## TODO
 
-- configure `ssmtp` (no local queue) for outbound mail assuming `$HOST` or use a fixed dns given by command line
+- investigate sendmail replacement for PHP (`ssmtp`, `msmtp`, `dma`)
 - Investigate xdebug usage (via XDEBUG_REMOTE_HOST to set the remote host to connect to).
 
 ## References
