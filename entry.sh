@@ -11,13 +11,17 @@ error() {
 
 # Determines the host address.
 # Unless HOST is set via run args (HOST=host.docker.internal), use default gateway IP (podman ptp)
-GATEWAY_IP=$( ip route list | egrep default | cut -d" " -f3 )
+GATEWAY_IP=$( ip route list | grep default | cut -d" " -f3 )
 export HOST="${HOST:-$GATEWAY_IP}"
 
 export HTTPD_PORT="${HTTPD_PORT:-80}"
 export HTTPD_ROOT="${HTTPD_ROOT:-/var/www/app}"
 export HTTPD_SERVERNAME="${HTTPD_SERVERNAME:-${HOSTNAME:-localhost}}"
 export HTTPD_REALIP_HEADER="${HTTPD_REALIP_HEADER:-X-Forwarded-For}"
+
+# Hook for overriding or setting variables
+[ -f entry-config.sh ] && source entry-config.sh
+
 
 # Starts SSH service if dropbear is installed
 if apk info --installed dropbear &>/dev/null; then
@@ -27,8 +31,11 @@ if apk info --installed dropbear &>/dev/null; then
   dropbear -REmsp ${SSHD_PORT:-22}
 fi
 
-# Starts Apache, unless --disable-apache
+# Starts Apache
 httpd -k start
+
+# Pre-exec hook: can terminate started services or start new ones OR replace exec
+[ -f entry-run.sh ] && source entry-run.sh
 
 # Run FPM via exec. 
 exec /usr/local/sbin/php-fpm --fpm-config /etc/php/php-fpm.conf $@
