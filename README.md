@@ -39,6 +39,7 @@ Additional extensions are available but *disabled by default*:
 
 - [imagick](https://github.com/Imagick/imagick) (`-dextension=imagick.so`) !! requires additional build step `apk add imagemagick` (+114 MB)
 - [PhpRedis](https://github.com/phpredis/phpredis) (`-dextension=redis.so`)
+- [AMQP](https://github.com/php-amqp/php-amqp) (`-dextension=amqp.so`)
 - [Xdebug](https://xdebug.org/) (`-dzend_extension=xdebug.so`)
 
 ## Notes
