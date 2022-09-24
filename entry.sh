@@ -9,6 +9,9 @@ error() {
 
 [[ $$ == "1" ]] || error "This script must be run as the image entry point. Current pid=$$"
 
+
+SCRIPT_PATH=$(dirname "$0")
+
 # Determines the host address.
 # Unless HOST is set via run args (HOST=host.docker.internal), use default gateway IP (podman ptp)
 GATEWAY_IP=$( ip route list | grep default | cut -d" " -f3 )
@@ -20,7 +23,7 @@ export HTTPD_SERVERNAME="${HTTPD_SERVERNAME:-${HOSTNAME:-localhost}}"
 export HTTPD_REALIP_HEADER="${HTTPD_REALIP_HEADER:-X-Forwarded-For}"
 
 # Hook for overriding or setting variables
-[ -f entry-config.sh ] && source entry-config.sh
+[ -f "${SCRIPT_PATH}/entry-config.sh" ] && source "${SCRIPT_PATH}/entry-config.sh"
 
 
 # Starts SSH service if dropbear is installed
@@ -35,7 +38,7 @@ fi
 httpd -k start
 
 # Pre-exec hook: can terminate started services or start new ones OR replace exec
-[ -f entry-run.sh ] && source entry-run.sh
+[ -f "${SCRIPT_PATH}/entry-run.sh" ] && source "${SCRIPT_PATH}/entry-run.sh"
 
 # Run FPM via exec. 
 exec /usr/local/sbin/php-fpm --fpm-config /etc/php/php-fpm.conf $@
