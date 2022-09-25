@@ -49,8 +49,7 @@ Additional extensions are available but *disabled by default*:
 
 ## TODO
 
-- investigate sendmail replacement for PHP (`ssmtp`, `msmtp`, `dma`)
-- Investigate xdebug usage (via XDEBUG_REMOTE_HOST to set the remote host to connect to).
+- include `msmtp` for sending emails
 
 ## References
 
