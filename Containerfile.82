@@ -1,0 +1,93 @@
+# docker buildx build --file Containerfile.82 --tag ghcr.io/themecraftstudio/php-fpm:8.2 .
+# docker push ghcr.io/themecraftstudio/php-fpm:8.2
+
+FROM php:8.2-fpm-alpine AS builder
+
+ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64-v3
+ENV LDFLAGS -s
+ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c linux-headers libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
+                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev icu-dev \
+                    libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev rabbitmq-c-dev
+
+# Upgrade to edge which provides GCC 11.2
+# RUN echo -e "https://dl-cdn.alpinelinux.org/alpine/edge/main\nhttps://dl-cdn.alpinelinux.org/alpine/edge/community" > /etc/apk/repositories
+# RUN apk update && apk add --upgrade apk-tools && apk upgrade --available
+
+RUN apk update && apk upgrade && apk add --virtual .php-deps-dev ${PHP_BUILD_DEPS}
+RUN docker-php-source extract
+
+WORKDIR /usr/src/php
+RUN rm -rf /usr/local/bin/p* /usr/local/sbin/* /usr/local/lib/php
+RUN ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
+  --prefix=/usr/local --with-config-file-path=/etc/php --with-config-file-scan-dir=/etc/php/conf.d \
+  --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
+  --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
+  --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-pgsql --without-sqlite3 --without-pdo-sqlite \
+  --with-zip --with-zlib --with-bz2 \
+  --enable-bcmath --with-gmp --enable-mbstring --with-iconv \
+  --enable-gd --with-jpeg --with-webp --enable-exif \
+  --enable-calendar --enable-intl --enable-pcntl --enable-shmop --enable-re2c-cgoto --enable-soap --enable-sockets --with-curl --with-libedit --with-xsl
+RUN make --jobs=$(nproc)
+RUN make install
+
+ENV PHP_EXT_APCU_SRC=https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.22.tar.gz
+ENV PHP_EXT_REDIS_SRC=https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz
+ENV PHP_EXT_AMQP_SRC=https://github.com/php-amqp/php-amqp/archive/refs/tags/v1.11.0.tar.gz
+ENV PHP_EXT_IMAGICK_SRC=https://github.com/Imagick/imagick/archive/refs/tags/3.7.0.tar.gz
+ENV PHP_EXT_XDEBUG_SRC=https://github.com/xdebug/xdebug/archive/refs/tags/3.2.0.tar.gz
+RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/amqp && cd /usr/src/amqp && curl --location ${PHP_EXT_AMQP_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_EXT_IMAGICK_SRC} | tar xzf - --strip-components=1
+RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_XDEBUG_SRC} | tar xzf - --strip-components=1
+
+RUN cd /usr/src/apcu && phpize \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
+RUN cd /usr/src/phpredis && phpize \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
+RUN cd /usr/src/amqp && phpize \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
+RUN cd /usr/src/imagick && phpize \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
+RUN cd /usr/src/xdebug && phpize \
+  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
+  && make --jobs=$(nproc) \
+  && make install
+
+ENTRYPOINT ["/bin/sh"]
+
+# Create the image
+FROM alpine:latest
+RUN apk upgrade --no-cache --purge \
+  && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs libzip libxslt oniguruma libsodium argon2-libs libpq rabbitmq-c-dev \
+  && apk add --no-cache apache2 apache2-proxy ssmtp \
+  && mkdir -p /var/www/app && chown apache:apache /var/www /var/www/app
+COPY --from=builder /usr/local/bin/phar /usr/local/bin/
+COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
+COPY --from=builder /usr/local/bin/php /usr/local/bin/
+COPY --from=builder /usr/local/bin/php-config /usr/local/bin/
+COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=builder /usr/local/sbin/php-fpm /usr/local/sbin/
+ADD conf/php-fpm.conf /etc/php/php-fpm.conf
+ADD conf/php.ini /etc/php/php.ini
+ADD conf/apache.conf /etc/apache2/httpd.conf
+ADD entry.sh /usr/local/bin/entry.sh
+ADD reload.sh /usr/local/bin/reload.sh
+
+ENTRYPOINT ["/usr/local/bin/entry.sh"]
+#CMD ["--nodaemonize"]
+WORKDIR /var/www/app
+
+EXPOSE 9000/tcp
+EXPOSE 80/tcp
+
+LABEL org.opencontainers.image.source https://github.com/ettoredn/container-php-fpm
+LABEL org.opencontainers.image.description Production-ready PHP-FPM image for containerized web apps
