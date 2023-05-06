@@ -6,7 +6,7 @@ FROM php:8.2-fpm-alpine AS builder
 ENV CPPFLAGS -Ofast -fno-lto -fno-semantic-interposition
 ENV LDFLAGS -s
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c linux-headers libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
-                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev icu-dev \
+                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev gmp-dev icu-dev \
                     libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev rabbitmq-c-dev
 
 # Upgrade to edge which provides GCC 11.2
@@ -33,12 +33,10 @@ RUN make install
 ENV PHP_EXT_APCU_SRC=https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.22.tar.gz
 ENV PHP_EXT_REDIS_SRC=https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz
 ENV PHP_EXT_AMQP_SRC=https://github.com/php-amqp/php-amqp/archive/refs/tags/v1.11.0.tar.gz
-ENV PHP_EXT_IMAGICK_SRC=https://github.com/Imagick/imagick/archive/refs/tags/3.7.0.tar.gz
 ENV PHP_EXT_XDEBUG_SRC=https://github.com/xdebug/xdebug/archive/refs/tags/3.2.0.tar.gz
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/amqp && cd /usr/src/amqp && curl --location ${PHP_EXT_AMQP_SRC} | tar xzf - --strip-components=1
-RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_EXT_IMAGICK_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_XDEBUG_SRC} | tar xzf - --strip-components=1
 
 RUN cd /usr/src/apcu && phpize \
@@ -50,10 +48,6 @@ RUN cd /usr/src/phpredis && phpize \
   && make --jobs=$(nproc) \
   && make install
 RUN cd /usr/src/amqp && phpize \
-  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
-  && make --jobs=$(nproc) \
-  && make install
-RUN cd /usr/src/imagick && phpize \
   && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
