@@ -5,8 +5,8 @@ FROM php:8.1-fpm-alpine AS builder
 
 ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64-v3
 ENV LDFLAGS -s
-ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
-                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev imagemagick-dev gmp-dev icu-dev \
+ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c linux-headers libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
+                    bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev gmp-dev icu-dev \
                     libxslt-dev oniguruma-dev libsodium-dev argon2-dev libpq-dev rabbitmq-c-dev
 
 # Upgrade to edge which provides GCC 11.2
@@ -20,7 +20,7 @@ WORKDIR /usr/src/php
 RUN rm -rf /usr/local/bin/p* /usr/local/sbin/* /usr/local/lib/php
 RUN ./configure --enable-option-checking=fatal --build=x86_64-linux-musl \
   --prefix=/usr/local --with-config-file-path=/etc/php --with-config-file-scan-dir=/etc/php/conf.d \
-  --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-short-tags \
+  --enable-cli --enable-fpm --with-fpm-user=apache --with-fpm-group=apache --disable-cgi --disable-phpdbg --disable-short-tags \
   --with-sodium --with-password-argon2 --with-openssl --with-system-ciphers \
   --enable-mysqlnd --with-pdo-mysql=mysqlnd --with-mysqli=mysqlnd --with-pdo-pgsql --without-sqlite3 --without-pdo-sqlite \
   --with-zip --with-zlib --with-bz2 \
@@ -33,12 +33,10 @@ RUN make install
 ENV PHP_EXT_APCU_SRC=https://github.com/krakjoe/apcu/archive/refs/tags/v5.1.22.tar.gz
 ENV PHP_EXT_REDIS_SRC=https://github.com/phpredis/phpredis/archive/refs/tags/5.3.7.tar.gz
 ENV PHP_EXT_AMQP_SRC=https://github.com/php-amqp/php-amqp/archive/refs/tags/v1.11.0.tar.gz
-ENV PHP_EXT_IMAGICK_SRC=https://github.com/Imagick/imagick/archive/refs/tags/3.7.0.tar.gz
-ENV PHP_EXT_XDEBUG_SRC=https://github.com/xdebug/xdebug/archive/refs/tags/3.1.5.tar.gz
+ENV PHP_EXT_XDEBUG_SRC=https://github.com/xdebug/xdebug/archive/refs/tags/3.2.1.tar.gz
 RUN mkdir -p /usr/src/apcu && cd /usr/src/apcu && curl --location ${PHP_EXT_APCU_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/phpredis && cd /usr/src/phpredis && curl --location ${PHP_EXT_REDIS_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/amqp && cd /usr/src/amqp && curl --location ${PHP_EXT_AMQP_SRC} | tar xzf - --strip-components=1
-RUN mkdir -p /usr/src/imagick && cd /usr/src/imagick && curl --location ${PHP_EXT_IMAGICK_SRC} | tar xzf - --strip-components=1
 RUN mkdir -p /usr/src/xdebug && cd /usr/src/xdebug && curl --location ${PHP_EXT_XDEBUG_SRC} | tar xzf - --strip-components=1
 
 RUN cd /usr/src/apcu && phpize \
@@ -53,10 +51,6 @@ RUN cd /usr/src/amqp && phpize \
   && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
   && make install
-RUN cd /usr/src/imagick && phpize \
-  && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
-  && make --jobs=$(nproc) \
-  && make install
 RUN cd /usr/src/xdebug && phpize \
   && ./configure --with-php-config=/usr/local/bin/php-config --enable-option-checking=fatal \
   && make --jobs=$(nproc) \
@@ -68,7 +62,7 @@ ENTRYPOINT ["/bin/sh"]
 FROM alpine:latest
 RUN apk upgrade --no-cache --purge \
   && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs libzip libxslt oniguruma libsodium argon2-libs libpq rabbitmq-c-dev \
-  && apk add --no-cache apache2 apache2-proxy ssmtp \
+  && apk add --no-cache apache2 apache2-proxy \
   && mkdir -p /var/www/app && chown apache:apache /var/www /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
