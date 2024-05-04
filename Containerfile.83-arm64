@@ -3,7 +3,7 @@
 
 FROM php:8.3-fpm-alpine AS builder
 
-ENV CPPFLAGS -Ofast -fno-lto -fno-semantic-interposition
+ENV CPPFLAGS -O3 -fno-lto -fno-semantic-interposition
 ENV LDFLAGS -s
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c linux-headers libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
                     bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev gmp-dev icu-dev \

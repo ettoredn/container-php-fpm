@@ -3,7 +3,7 @@
 
 FROM php:8.3-fpm-alpine AS builder
 
-ENV CPPFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64-v3
+ENV CPPFLAGS -O3 -fallow-store-data-races -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 -march=x86-64-v3
 ENV LDFLAGS -s
 ENV PHP_BUILD_DEPS git file autoconf pkgconf dpkg dpkg-dev make g++ re2c linux-headers libc-dev libxml2-dev openssl-dev libedit-dev libzip-dev \
                     bzip2-dev curl-dev libpng-dev libjpeg-turbo-dev libwebp-dev gmp-dev icu-dev \
