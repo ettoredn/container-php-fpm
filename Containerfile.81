@@ -62,7 +62,7 @@ ENTRYPOINT ["/bin/sh"]
 FROM alpine:latest
 RUN apk upgrade --no-cache --purge \
   && apk add --no-cache --virtual .php-deps libxml2 openssl libedit libbz2 libcurl libpng libjpeg-turbo libwebp libgomp gmp icu-libs libzip libxslt oniguruma libsodium argon2-libs libpq rabbitmq-c-dev \
-  && apk add --no-cache apache2 apache2-proxy \
+  && apk add --no-cache apache2 apache2-http2 apache2-proxy \
   && mkdir -p /var/www/app && chown apache:apache /var/www /var/www/app
 COPY --from=builder /usr/local/bin/phar /usr/local/bin/
 COPY --from=builder /usr/local/bin/phar.phar /usr/local/bin/
